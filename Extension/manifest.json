@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "LunarByte Deepfake Detector",
+  "version": "1.0.0",
+  "description": "Real-time deepfake detection for videos on any website",
+
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["overlay.css"],
+      "run_at": "document_end"
+    }
+  ],
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "LunarByte Deepfake Detector"
+  },
+
+
+  "web_accessible_resources": [
+    {
+      "resources": ["overlay.css"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

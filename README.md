@@ -8,81 +8,84 @@ Real-time deepfake detection solution for web environments.
 
 ## What is LunarByte?
 
-LunarByte analyzes video streams within web browsers to detect deepfake content in real-time. This open-source project provides accessible deepfake detection capabilities directly in the browser environment without requiring external servers or cloud services.
+LunarByte analyzes video streams within web browsers to detect deepfake content in real-time. This project provides deepfake detection capabilities through a Chrome browser extension that connects to a FastAPI backend server running DFDC Challenge models.
 
-The project addresses the growing concern of manipulated media content by offering a privacy-focused solution that processes video data locally on the user's device. Whether implemented as a browser extension or web application, LunarByte aims to help users identify potentially synthetic video content across various online platforms.
+The system combines a Chrome extension for video detection, a FastAPI server for model inference, and React frontend for management interface. Video processing happens server-side using PyTorch models, ensuring accurate detection while maintaining user privacy through local processing.
 
 ## Core Features
 
-The system provides real-time video stream analysis from webcams, video elements, and streaming content using AI-powered deepfake detection through machine learning models. Browser extension support covers major browsers while a web application interface offers direct usage without installation requirements.
+The system detects video elements on any website automatically and analyzes frames every 5 seconds using DFDC Challenge EfficientNet-B7 model. Results appear as browser overlay showing deepfake probability and confidence scores. The Chrome extension works across YouTube, Netflix, and all HTML5 video sites.
 
-**Privacy remains central to the design** - all video processing occurs locally on the user's device with no data transmission to external servers. The open-source codebase ensures full transparency in how the detection algorithms operate.
+**Model accuracy depends on DFDC training data** - detection works best on face-swap deepfakes but may miss other manipulation types. Processing requires backend server connection for inference.
 
 ## Technical Implementation
 
-The frontend utilizes JavaScript for core functionality, WebRTC for real-time video stream handling, Canvas API for video frame processing, and Web Extensions API for browser integration. Machine learning components rely on TensorFlow.js for in-browser model execution and OpenCV.js for computer vision processing with pre-trained deepfake detection models.
+The Chrome extension captures video frames using Canvas API and sends them to FastAPI backend via HTTP requests. Backend runs PyTorch DFDC model for inference and returns deepfake probability scores. Frontend React app provides optional management interface.
 
-Development infrastructure includes Webpack for bundling and optimization, ESLint for code quality maintenance, Jest for testing, and GitHub Actions for continuous integration and deployment.
+Architecture separates concerns cleanly - extension handles video detection and overlay display, backend processes model inference, frontend manages settings and statistics.
 
 ## Getting Started
 
-Prerequisites include Node.js version 16 or higher, npm or yarn package manager, and a modern web browser supporting Chrome, Firefox, Safari, or Edge.
+### Backend Server Setup
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/LunarByte.git
-cd LunarByte
+cd Backend
+python -m venv venv
+source venv/bin/activate  # macOS/Linux
+pip install -r requirements.txt
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+```
 
-# Install dependencies
+### Model Weights Download
+
+Download DFDC model weights manually from the [DFDC Challenge repository](https://github.com/selimsef/dfdc_deepfake_challenge). Place the `final_111_DeepFakeClassifier_tf_efficientnet_b7_ns_0_36` file in `Backend/weights/` directory.
+
+### Chrome Extension Installation
+
+Navigate to `chrome://extensions/`, enable developer mode, click "Load unpacked extension", and select the `Extension` folder.
+
+### Frontend Setup (Optional)
+
+```bash
+cd Frontend
 npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
+npm start
 ```
 
-For browser extension setup, build the extension and load it into your browser.
+## Project Structure
 
-```bash
-# Build extension
-npm run build:extension
+```
+LunarByte/
+├── Backend/          # FastAPI server with DFDC model
+├── Frontend/         # (deprecated) React management interface
+├── Extension/        # Chrome extension files
+└── dfdc_deepfake_challenge/  # DFDC model code
 ```
 
-Navigate to your browser's extensions page (chrome://extensions/), enable developer mode, and load the unpacked extension from the dist folder.
+## API Endpoints
 
-For web application usage, start the server and access it through your browser.
+### POST `/analyze-frame`
 
-```bash
-# Start web application
-npm run serve
+Analyzes video frame for deepfake detection.
 
-# Access at http://localhost:3000
+**Request:** `multipart/form-data` with `frame` image file
+**Response:**
+
+```json
+{
+  "status": "success",
+  "is_deepfake": true,
+  "confidence": 0.85,
+  "deepfake_probability": 0.85
+}
 ```
 
-## Project Structure and Development
+## Usage Flow
 
-The codebase organizes into src/extension for browser extension code, src/webapp for web application code, src/models for ML model files, src/utils for utility functions, and src/components for reusable UI components. Additional directories include tests for testing files, docs for documentation, and build for build configuration.
+Start the backend server, install Chrome extension, visit video websites like YouTube or Netflix. Video playback triggers automatic frame analysis every 5 seconds. Results display in browser overlay on the right side of the page.
 
-**Contributing follows standard open-source practices** with issue tracking, feature branching using descriptive names like `feature/your-feature-name` or `fix/issue-description`, code style adherence, test coverage for new functionality, and clear pull request descriptions.
+## Limitations
 
-## Detection Methodology
+Model file size requires manual download due to 100MB size. GPU processing recommended for real-time performance. Detection accuracy varies by deepfake type and quality. Extension works only on HTTPS sites due to browser security policies.
 
-The current implementation combines facial landmark analysis for face manipulation detection, temporal consistency analysis for video authenticity verification, and ensemble learning approaches for improved accuracy across different types of synthetic content.
-
-Performance considerations include processing optimization for real-time performance, minimized memory usage for browser environments, configurable quality versus speed trade-offs, and efficient model loading and caching mechanisms.
-
-## Development Roadmap
-
-The current phase focuses on basic deepfake detection implementation, Chrome extension development, and core web application features. The next phase will introduce Firefox extension support, improved detection accuracy, and performance optimizations.
-
-Future plans include audio deepfake detection capabilities, mobile browser support, API service development for third-party integration, and advanced reporting features for detailed analysis results.
-
-## License and Support
-
-This project operates under the MIT License, providing broad permissions for use, modification, and distribution. Support channels include GitHub Issues for bug reports and feature requests, GitHub Discussions for community conversation, and direct contact through issue creation for questions or feedback.
-
-The project builds upon research and tools from the computer vision and deepfake detection community, acknowledging contributions from researchers and developers working on media authenticity and digital forensics.
-
-**This tool serves as a supplementary verification method for deepfake detection**. Results should be considered alongside other verification approaches when making important decisions about media authenticity.
+**Detection results should supplement other verification methods** rather than serve as definitive proof of content authenticity.
