@@ -117,7 +117,7 @@ class DeepfakeDetector {
       const formData = new FormData();
       formData.append('file', frameBlob, 'frame.jpg');
 
-      const response = await fetch('http://localhost:8000/analyze-frame', {
+      const response = await fetch('http://127.0.0.1:8000/analyze-frame/', {
         method: 'POST',
         body: formData
       });
@@ -165,6 +165,20 @@ class DeepfakeDetector {
     }
   }
 
+  getStatusColor(probability) {
+    if (!probability && probability !== 0) return "rgba(255,255,255,0.2)";
+    if (probability > 70) return "#ef4444";
+    if (probability > 40) return "#f59e0b";
+    return "#10b981";
+  }
+
+  getStatusText(probability) {
+    if (!probability && probability !== 0) return "Analyzing...";
+    if (probability > 70) return "HIGH RISK - Likely Deepfake";
+    if (probability > 40) return "MEDIUM RISK - Possible Deepfake";
+    return "LOW RISK - Likely Authentic";
+  }
+
   updateOverlay(result) {
     if (!this.overlayElement) return;
 
@@ -172,29 +186,59 @@ class DeepfakeDetector {
     const resultElement = this.overlayElement.querySelector('.lunarbyte-result');
 
     if (result.error) {
-      statusElement.textContent = 'Error';
-      resultElement.innerHTML = `<span class="error">${result.error}</span>`;
+      statusElement.textContent = 'Connection Error';
+      statusElement.style.color = '#ef4444';
+      resultElement.innerHTML = `<span style="color: #ef4444; font-size: 12px;">${result.error}</span>`;
       return;
     }
 
     if (result.status === 'analyzing') {
       statusElement.textContent = 'Analyzing video...';
+      statusElement.style.color = 'rgba(255,255,255,0.7)';
       resultElement.innerHTML = '<div class="loading-spinner"></div>';
       return;
     }
 
-    // 딥페이크 결과 표시
-    const confidence = result.confidence || 0;
-    const isDeepfake = result.is_deepfake || false;
+    // 프론트엔드와 같은 스타일로 딥페이크 결과 표시
+    const probability = result.fake_probability;
+    const statusColor = this.getStatusColor(probability);
+    const statusText = this.getStatusText(probability);
 
-    statusElement.textContent = isDeepfake ? '⚠️ Deepfake Detected' : '✅ Authentic Video';
-    statusElement.className = `lunarbyte-status ${isDeepfake ? 'deepfake' : 'authentic'}`;
+    statusElement.textContent = statusText;
+    statusElement.style.color = statusColor;
+    statusElement.style.fontSize = '11px';
+    statusElement.style.fontWeight = '500';
+    statusElement.style.textTransform = 'uppercase';
+    statusElement.style.letterSpacing = '0.05em';
+    statusElement.style.marginBottom = '8px';
 
     resultElement.innerHTML = `
-      <div class="confidence-bar">
-        <div class="confidence-fill" style="width: ${confidence * 100}%"></div>
+      <div style="
+        font-size: 24px;
+        font-weight: 600;
+        line-height: 1;
+        letter-spacing: -0.02em;
+        margin-bottom: 8px;
+        color: ${statusColor};
+      ">
+        ${probability !== undefined ? `${Math.round(probability)}%` : 'Processing...'}
       </div>
-      <div class="confidence-text">Confidence: ${(confidence * 100).toFixed(1)}%</div>
+      <div style="
+        font-size: 10px;
+        opacity: 0.6;
+        font-weight: 400;
+        margin-bottom: 8px;
+      ">
+        Deepfake Probability
+      </div>
+      ${result.timestamp ? `
+        <div style="
+          font-size: 9px;
+          opacity: 0.6;
+        ">
+          Last updated: ${new Date(result.timestamp).toLocaleTimeString()}
+        </div>
+      ` : ''}
     `;
   }
 }
