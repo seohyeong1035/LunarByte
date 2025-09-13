@@ -18,7 +18,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "chrome-extension://*", "*"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -53,7 +53,7 @@ print(f" {len(models)}개의 DeepFakeClassifier 모델 로드 완료")
 def root():
     return {"message": "Deepfake Server Running with DFDC Ensemble Model!"}
 
-@app.post("/analyze-frame/")
+@app.post("/analyze-frame")
 async def analyze_frame(file: UploadFile = File(...)):
     contents = await file.read()
     image = Image.open(BytesIO(contents)).convert("RGB")

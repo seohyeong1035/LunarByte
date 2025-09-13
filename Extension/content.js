@@ -115,7 +115,7 @@ class DeepfakeDetector {
     try {
       // Backend API 호출
       const formData = new FormData();
-      formData.append('frame', frameBlob, 'frame.jpg');
+      formData.append('file', frameBlob, 'frame.jpg');
 
       const response = await fetch('http://localhost:8000/analyze-frame', {
         method: 'POST',
