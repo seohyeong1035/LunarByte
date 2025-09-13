@@ -200,7 +200,7 @@ class DeepfakeDetector {
     }
 
     // 프론트엔드와 같은 스타일로 딥페이크 결과 표시
-    const probability = result.fake_probability;
+    const probability = result.deepfake_probability * 100;
     const statusColor = this.getStatusColor(probability);
     const statusText = this.getStatusText(probability);
 
