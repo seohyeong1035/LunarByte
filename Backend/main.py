@@ -79,6 +79,10 @@ async def analyze_frame(file: UploadFile = File(...)):
     is_deepfake = prob > 0.5
     confidence = prob if is_deepfake else (1 - prob)
 
+    # 확장 프로그램에 맞는 응답 형식
+    is_deepfake = prob > 0.5
+    confidence = prob if is_deepfake else (1 - prob)
+
     return JSONResponse(content={
         "deepfake_probability": avg_prob,
         "result" : status_label
