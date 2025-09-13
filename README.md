@@ -98,6 +98,11 @@ To test the deepfake detection system:
    - **ORANGE (MEDIUM RISK)**: 40-70% deepfake probability - Possible deepfake
    - **RED (HIGH RISK)**: 70-100% deepfake probability - Likely deepfake
 
+![1-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/c4268929-23ad-4723-80ec-b90447c1479c)
+
+![222-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/f22e94a6-f091-4599-a1a0-5b0d5a752341)
+
+
 ### Test with Different Content Types
 
 **Try testing with:**
