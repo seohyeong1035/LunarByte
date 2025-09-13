@@ -12,9 +12,10 @@ venv\Scripts\activate
 
 pip install -r requirements.txt
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
 
 
-### 3. Download Model Weights
+# Download Model Weights
 
 This project uses the [Deepfake Detection Challenge model](https://github.com/selimsef/dfdc_deepfake_challenge).
 
