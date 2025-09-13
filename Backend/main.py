@@ -18,7 +18,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000", "chrome-extension://*", "*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -42,24 +42,30 @@ print("✅ DeepFakeClassifier 모델 로드 완료")
 def root():
     return {"message": "Deepfake Server Running with DFDC Model!"}
 
-@app.post("/analyze-frame/")
-async def analyze_frame(file: UploadFile = File(...)):
-    
-    contents = await file.read()
+@app.post("/analyze-frame")
+async def analyze_frame(frame: UploadFile = File(...)):
+
+    contents = await frame.read()
     image = Image.open(BytesIO(contents)).convert("RGB")
 
-    
+
     img_np = np.array(image)
     img_resized = cv2.resize(img_np, (380, 380))
     img_tensor = torch.tensor(img_resized).permute(2, 0, 1).unsqueeze(0).float() / 255.0
     img_tensor = img_tensor.to(device)
 
-   
+
     with torch.no_grad():
         output = model(img_tensor)
         prob = torch.sigmoid(output).item()
 
+    # 확장 프로그램에 맞는 응답 형식
+    is_deepfake = prob > 0.5
+    confidence = prob if is_deepfake else (1 - prob)
+
     return JSONResponse(content={
-        "status": "ok",
+        "status": "success",
+        "is_deepfake": is_deepfake,
+        "confidence": confidence,
         "deepfake_probability": prob
     })
