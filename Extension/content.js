@@ -3,7 +3,7 @@ class DeepfakeDetector {
     this.detectionInterval = null;
     this.overlayElement = null;
     this.lastAnalyzedTime = 0;
-    this.analysisInterval = 1000; // 1초마다 분석
+    this.analysisInterval = 2000;
     this.initializeDetector();
   }
 
