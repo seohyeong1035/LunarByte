@@ -18,7 +18,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000", "chrome-extension://*", "*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -74,6 +74,10 @@ async def analyze_frame(file: UploadFile = File(...)):
     avg_prob = float(np.mean(probs))
 
     status_label = "딥페이크 확률 높음!" if avg_prob > 0.5 else "딥페이크 확률 낮음"
+
+    # 확장 프로그램에 맞는 응답 형식
+    is_deepfake = prob > 0.5
+    confidence = prob if is_deepfake else (1 - prob)
 
     return JSONResponse(content={
         "deepfake_probability": avg_prob,
