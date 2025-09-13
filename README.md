@@ -82,7 +82,29 @@ Analyzes video frame for deepfake detection.
 
 ## Usage Flow
 
-Start the backend server, install Chrome extension, visit video websites like YouTube or Netflix. Video playback triggers automatic frame analysis every 5 seconds. Results display in browser overlay on the right side of the page.
+Start the backend server, install Chrome extension, visit video websites like YouTube or Netflix. Video playback triggers automatic frame analysis every 2 seconds. Results display in browser overlay on the right side of the page.
+
+## Test Videos
+
+To test the deepfake detection system:
+
+### How to Test
+
+1. Start the backend server and install the Chrome extension
+2. Go to YouTube and play any video
+3. The extension will automatically detect and analyze frames every 2 seconds
+4. Check the overlay results:
+   - **GREEN (LOW RISK)**: 0-40% deepfake probability - Likely authentic content
+   - **ORANGE (MEDIUM RISK)**: 40-70% deepfake probability - Possible deepfake
+   - **RED (HIGH RISK)**: 70-100% deepfake probability - Likely deepfake
+
+### Test with Different Content Types
+
+**Try testing with:**
+- Regular YouTube videos (should show LOW RISK)
+- News interviews and broadcasts
+- Entertainment content
+- Any suspicious content you want to verify
 
 ## Limitations
 
